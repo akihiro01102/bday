@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Birthday, My Love!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Press+Start+2P&display=swap&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/tone"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    /* General body styling for a soft, romantic feel */
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #ffe4e1; /* Misty Rose, a soft pink */
+      color: #333;
+      overflow-x: hidden; /* Prevent horizontal scroll on smaller screens */
+      min-height: 100vh; /* Ensure body takes full viewport height */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Main container for the card content */
+    .main-container {
+      max-width: 900px;
+      width: 95%; /* Fluid width for responsiveness */
+      margin: 20px auto;
+      background-color: #fff;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header styling */
+    header {
+      background-color: #ff69b4; /* Hot Pink */
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      font-family: 'Dancing Script', cursive; /* Elegant font for titles */
+      border-bottom: 5px solid #ff1493; /* Deep Pink border */
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 3.5em; /* Large font for main title */
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Subtle text shadow */
+    }
+
+    header p {
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+
+    /* Navigation styling */
+    nav {
+      background-color: #ffc0cb; /* Pink */
+      padding: 10px 0;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Light shadow for separation */
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap; /* Allows links to wrap on smaller screens */
+    }
+
+    nav ul li {
+      margin: 0 15px;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: #8b0000; /* Dark Red for contrast */
+      font-weight: 600;
+      padding: 8px 15px;
+      border-radius: 20px; /* Rounded pill shape for links */
+      transition: background-color 0.3s ease, color 0.3s ease; /* Smooth hover effects */
+    }
+
+    nav ul li a:hover,
+    nav ul li a.active {
+      background-color: #ff1493; /* Deep Pink on hover/active */
+      color: white;
+    }
+
+    /* Main content area */
+    main {
+      padding: 40px;
+      flex-grow: 1; /* Allows main content to take available space */
+    }
+
+    .page {
+      display: none; /* Hide all pages by default */
+      padding: 20px 0;
+      text-align: center;
+    }
+
+    .page.active {
+      display: block; /* Show only the active page */
+    }
+
+    .page h2 {
+      color: #ff69b4; /* Hot Pink for section titles */
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #ffc0cb; /* Light pink underline */
+      padding-bottom: 10px;
+      display: inline-block; /* Makes the underline fit the text */
+    }
+
+    .page p {
+      line-height: 1.8; /* Improved readability for paragraphs */
+      font-size: 1.1em;
+      margin-bottom: 20px;
+    }
+
+    .rose-gif {
+      max-width: 80%;
+      height: auto;
+      margin-top: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* About Me Section Specifics */
+    .profile-picture {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%; /* Circular image */
+      object-fit: cover; /* Ensures image covers the area without distortion */
+      border: 5px solid #ffc0cb; /* Pink border around profile picture */
+      margin-bottom: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Photo Gallery Section Specifics */
+    #photo-gallery {
+      text-align: center;
+      padding: 40px;
+      background-color: #fff0f6; /* Lighter pink for gallery background */
+      border-radius: 15px; /* Match container border-radius */
+    }
+
+    .book-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .page-wrapper {
+      position: relative;
+      width: 300px; /* Fixed width for the photo display area */
+      height: 400px; /* Fixed height for the photo display area */
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .page-item {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0; /* Hidden by default */
+      transition: opacity 0.6s ease-in-out; /* Smooth fade transition */
+      background-color: #eee; /* Placeholder background */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .page-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Ensures image covers the area */
+      border-radius: 12px;
+    }
+
+    .page-item.active {
+      opacity: 1; /* Show active page */
+      z-index: 1; /* Bring active page to front */
+    }
+
+    .navigation-buttons {
+      margin-top: 20px;
+      display: flex;
+      gap: 15px; /* Space between buttons */
+    }
+
+    .nav-button {
+      padding: 12px 25px;
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease; /* Button hover effects */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-button:hover {
+      background-color: #ff1493;
+      transform: translateY(-2px); /* Slight lift effect on hover */
+    }
+
+    /* Footer styling */
+    footer {
+      background-color: #ff69b4;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.1em;
+      border-top: 5px solid #ff1493;
+      border-bottom-left-radius: 15px;
+      border-bottom-right-radius: 15px;
+    }
+
+    /* Petal Styling: This is where the magic happens for falling petals */
+    .petal {
+        position: fixed; /* Fixed position relative to the viewport */
+        width: 25px; /* Size of the petal */
+        height: 25px;
+        /* Background image for the petal. Ensure this URL is accessible. */
+        background-image: url('https://pngimg.com/uploads/rose/rose_PNG66884.png');
+        background-size: cover; /* Ensures the image covers the petal element */
+        opacity: 0.8; /* Slightly transparent */
+        pointer-events: none; /* Allows clicks to pass through the petals to elements below */
+        animation: fall linear infinite; /* Apply the falling animation continuously */
+        z-index: 999; /* Ensure petals are on top of other content */
+    }
+
+    /* Keyframe animation for the falling effect */
+    @keyframes fall {
+        0% {
+            transform: translateY(-10%) rotate(0deg); /* Start slightly above viewport, no rotation */
+            opacity: 0.8;
+        }
+        100% {
+            transform: translateY(110vh) rotate(360deg); /* Fall to 110% of viewport height, complete rotation */
+            opacity: 0; /* Fade out as it falls */
+        }
+    }
+
+    /* Responsive adjustments for smaller screens */
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2.5em;
+      }
+
+      header p {
+        font-size: 1em;
+      }
+
+      nav ul li {
+        margin: 0 8px;
+      }
+
+      nav ul li a {
+        padding: 6px 10px;
+        font-size: 0.9em;
+      }
+
+      main {
+        padding: 20px;
+      }
+
+      .page h2 {
+        font-size: 2em;
+      }
+
+      .page p {
+        font-size: 1em;
+      }
+
+      .book-container {
+        width: 100%; /* Make book container fluid */
+      }
+
+      .page-wrapper {
+        width: 250px; /* Adjust photo size for tablets */
+        height: 350px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 2em;
+      }
+
+      header p {
+        font-size: 0.9em;
+      }
+
+      nav ul {
+        flex-direction: column; /* Stack navigation links vertically */
+        gap: 5px;
+      }
+
+      nav ul li {
+        margin: 5px 0;
+      }
+
+      .nav-button {
+        padding: 10px 20px;
+        font-size: 14px;
+      }
+
+      .book-container {
+        width: 100%;
+      }
+
+      .page-wrapper {
+        width: 200px; /* Adjust photo size for mobile phones */
+        height: 300px;
+      }
+    }
+  </style>
+  <script>
+    let player; // Tone.js player instance
+    let isPlaying = false; // Flag to track if music is playing
+
+    /**
+     * Sets up the Tone.js player with the background music.
+     * This function is called only once to load the audio.
+     */
+    async function setupPlayer() {
+      if (!player) {
+        // URL to the background music file
+        const audioUrl = "https://raw.githubusercontent.com/akihiro01102/bday/main/tahanan.mp3";
+        player = new Tone.Player(audioUrl).toDestination(); // Create player and route to speakers
+        try {
+          await player.load(); // Load the audio buffer
+          player.loop = true; // Loop the music
+          console.log("Audio buffer loaded successfully!");
+        } catch (error) {
+          console.error("Error loading audio buffer:", error);
+        }
+      }
+    }
+
+    /**
+     * Plays the background music, launches fireworks, and starts falling petals
+     * on the first user interaction (click).
+     */
+    async function playMusic() {
+      if (!isPlaying) {
+        await setupPlayer(); // Ensure player is set up
+        await Tone.start(); // Start Tone.js audio context (required by modern browsers)
+        player.start(); // Start playing the music
+        isPlaying = true;
+
+        // Launch fireworks immediately after music starts
+        launchFireworks();
+
+        // Start falling petals: spawn 3 petals every 500ms for a denser effect
+        setInterval(() => {
+          createPetal();
+          createPetal();
+          createPetal();
+        }, 500);
+      }
+    }
+
+    /**
+     * Launches a burst of confetti fireworks.
+     * The fireworks will animate for a set duration.
+     */
+    function launchFireworks() {
+      const duration = 5 * 1000; // Fireworks duration in milliseconds (5 seconds)
+      const animationEnd = Date.now() + duration;
+
+      // Set an interval to continuously launch confetti until duration ends
+      const interval = setInterval(function () {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) {
+          return clearInterval(interval); // Stop launching confetti
+        }
+
+        // Launch 3 bursts of confetti every 400ms
+        for (let i = 0; i < 3; i++) {
+          confetti({
+            startVelocity: 40, // Initial velocity of particles
+            spread: 360, // Spread particles in all directions
+            ticks: 80, // How long the particles animate
+            zIndex: 2000, // Ensure confetti is on top
+            particleCount: 80, // Number of particles per burst
+            origin: {
+              x: Math.random(), // Random horizontal origin
+              y: Math.random() - 0.2 // Random vertical origin (slightly above center)
+            }
+          });
+        }
+      }, 400);
+    }
+
+    /**
+     * Creates a single petal element and adds it to the document body.
+     * The petal will fall and fade out based on CSS animations.
+     */
+    function createPetal() {
+      const petal = document.createElement('div');
+      petal.classList.add('petal'); // Add the 'petal' class for styling and animation
+      petal.style.left = Math.random() * 100 + 'vw'; // Random horizontal position (0% to 100% of viewport width)
+      petal.style.animationDuration = (5 + Math.random() * 5) + 's'; // Random fall duration (5 to 10 seconds)
+      document.body.appendChild(petal); // Add the petal to the document
+
+      // Remove the petal from the DOM after its animation completes
+      // This prevents the DOM from getting cluttered with too many elements
+      setTimeout(() => petal.remove(), 10000); // Remove after 10 seconds (max animation duration)
+    }
+
+    // Event listener to start music, fireworks, and petals on any click on the body
+    window.addEventListener('load', () => {
+      document.body.addEventListener('click', playMusic);
+    });
+
+    // JavaScript for navigation and photo gallery functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const navLinks = document.querySelectorAll('nav ul li a');
+      const pages = document.querySelectorAll('.page');
+
+      // Handle navigation clicks to show/hide sections
+      navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault(); // Prevent default anchor link behavior
+          const targetId = this.getAttribute('href').substring(1); // Get target section ID
+
+          // Remove 'active' class from all nav links and pages
+          navLinks.forEach(nav => nav.classList.remove('active'));
+          pages.forEach(page => page.classList.remove('active'));
+
+          // Add 'active' class to the clicked nav link and its corresponding page
+          this.classList.add('active');
+          document.getElementById(targetId).classList.add('active');
+        });
+      });
+
+      // Photo gallery logic
+      const galleryPages = document.querySelectorAll('#photo-gallery .page-item');
+      const nextBtn = document.querySelector('.next-button');
+      const prevBtn = document.querySelector('.prev-button');
+      let currentGalleryPage = 0; // Index of the currently displayed photo
+
+      /**
+       * Displays the photo at the given index in the gallery.
+       * @param {number} index - The index of the photo to display.
+       */
+      function showGalleryPage(index) {
+        galleryPages.forEach((page, i) => {
+          page.classList.remove('active'); // Hide all photos
+          if (i === index) page.classList.add('active'); // Show the selected photo
+        });
+      }
+
+      // Event listener for the "Next" button in the gallery
+      nextBtn.addEventListener('click', () => {
+        currentGalleryPage = (currentGalleryPage + 1) % galleryPages.length; // Cycle to the next photo
+        showGalleryPage(currentGalleryPage);
+      });
+
+      // Event listener for the "Previous" button in the gallery
+      prevBtn.addEventListener('click', () => {
+        currentGalleryPage = (currentGalleryPage - 1 + galleryPages.length) % galleryPages.length; // Cycle to the previous photo
+        showGalleryPage(currentGalleryPage);
+      });
+
+      // Initialize the gallery to show the first photo when the page loads
+      showGalleryPage(currentGalleryPage);
+    });
+  </script>
+</head>
+<body>
+  <div class="main-container">
+    <header>
+      <h1>Happy Birthday, My Bebe</h1>
+      <p>To the cutest person that I met</p>
+    </header>
+    <nav>
+      <ul>
+        <li><a href="#welcome">Welcome</a></li>
+        <li><a href="#about-me">About Me</a></li>
+        <li><a href="#birthday-wishes">Birthday Wishes</a></li>
+        <li><a href="#photo-gallery" class="active">Photo Gallery</a></li>
+      </ul>
+    </nav>
+    <main>
+      <section id="welcome" class="page">
+        <h2>My Dearest Love,</h2>
+        <p>
+          Today, as you celebrate another year of life, my heart overflows with joy and gratitude for having you in my world.
+          You are the most incredible person I know, and I wanted to create something special to express my love and wishes for you.
+          May this day be as beautiful and radiant as your smile, and may the year ahead be filled with boundless happiness,
+          unforgettable moments, and dreams come true.
+        </p>
+        <img src="https://i.pinimg.com/originals/7e/3e/57/7e3e5757499f571b0b888b8959198f7f.gif" alt="Pink Roses GIF" class="rose-gif">
+      </section>
+
+      <section id="about-me" class="page">
+        <h2>About Me</h2>
+        <img src="images/me.jpg" alt="Your Profile Picture" class="profile-picture">
+        <p>
+          Hi, my bebe! I'm your bube, the luckiest person in the world to be your wonderful bibe AHHAHA.<br>
+          I wanted to take a moment to tell you how much you mean to me. You are the sunshine in my day,
+          the stars in my night, and the beat in my heart. Your kindness, intelligence, and unwavering spirit inspire me every day.
+          Thank you for being you and for sharing your life with me. I cherish every moment we spend together,
+          from our silliest adventures to our quietest moments. You make every day a celebration.
+        </p>
+      </section>
+
+      <section id="birthday-wishes" class="page">
+        <h2>Birthday Wishes for You</h2>
+        <p>
+          Happy birthday to my amazing bebe! Every day with you is a gift, and I'm so grateful for your presence in my life.
+          May your special day be filled with everything you wish for and more. I hope you feel all the love and happiness you
+          deserve. Here's to many more years of laughter, adventures, and cherished memories together.
+          You truly make my world a brighter place. I love you more than words can say!
+        </p>
+        <p>
+          Wishing you a day as beautiful as you are, and a year ahead that brings you closer to all your dreams.
+          May your path be filled with joy, success, and endless moments of bliss.
+        </p>
+      </section>
+
+      <section id="photo-gallery" class="page active">
+        <h2>Cute Pics</h2>
+        <div class="book-container">
+          <div class="page-wrapper">
+            <div class="page-item active"><img src="images/beb1.jpg" alt="Photo 1"></div>
+            <div class="page-item"><img src="images/beb2.jpg" alt="Photo 2"></div>
+            <div class="page-item"><img src="images/beb3.jpg" alt="Photo 3"></div>
+            <div class="page-item"><img src="images/beb4.jpg" alt="Photo 4"></div>
+            <div class="page-item"><img src="images/beb5.jpg" alt="Photo 5"></div>
+            <div class="page-item"><img src="images/beb6.jpg" alt="Photo 6"></div>
+            <div class="page-item"><img src="images/beb7.jpg" alt="Photo 7"></div>
+            <div class="page-item"><img src="images/beb8.jpg" alt="Photo 8"></div>
+          </div>
+          <div class="navigation-buttons">
+            <button class="nav-button prev-button">Previous</button>
+            <button class="nav-button next-button">Next</button>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <p>With all my love, Fankeki</p>
+    </footer>
+  </div>
+</body>
+</html>
